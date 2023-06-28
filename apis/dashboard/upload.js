@@ -1,3 +1,4 @@
+import { json } from "sequelize";
 import db from "../../models/index.js";
 import fs from "fs";
 
@@ -34,42 +35,61 @@ import fs from "fs";
 export const upload = async (req, res) => {
 
     try {
-        let { category, subCategory, softwareType, productType, indrusty, name, version, description, variant, seoKeywords, price, sourceFilePassword, fontName, fontUrl, imagesWebsiteName, imagesUrl, iconsWebsiteName, iconsUrl, technical } = req.body;
+        console.log('====================================');
+        console.log(req.body);
+        console.log('====================================');
+        let { category, subCategory, softwareType, productType, name, version, description, variant, seoKeywords, price, sourceFilePassword } = req.body;
 
         let fontArray = [];
-        fontName.map((item, index) => {
-            fontArray.push({ "fontName": item, "fontUrl": fontUrl[index] });
+        let fonts =  req.body.font;
+        fonts.map((item)=>{
+            let ft = JSON.parse(item)
+            fontArray.push({ "fontName": ft.fontName, "fontUrl": ft.fontUrl });
         })
 
         let imageArray = [];
-        imagesWebsiteName.map((item, index) => {
-            imageArray.push({ "imageName": item, "imageUrl": imagesUrl[index] });
+        let images =  req.body.images;
+        images.map((item)=>{
+            let img = JSON.parse(item);
+            imageArray.push({ "imageName": img.name, "imageUrl": img.imageUrl });
         })
 
         let iconArray = [];
-        iconsWebsiteName.map((item, index) => {
-            iconArray.push({ "iconName": item, "iconUrl": iconsUrl[index] });
+        let icons =  req.body.icons;
+        icons.map((item)=>{
+            let ic = JSON.parse(item)
+            iconArray.push({ "iconName": ic.name, "iconUrl": ic.iconUrl });
+        })
+
+        let technicalArray = [];
+        let technicals =  req.body.technical;
+        technicals.map((item)=>{
+            let tc = JSON.parse(item)
+            technicalArray.push(tc.name);
         })
 
         let sliderImages = req.files['sliderImages'];
         let fullImages = req.files['fullPageImages'];
         let sourceFiles = req.files['sourceFile'][0];
 
-        let newProduct = await db.product.create({ name, version, description, productType, variant, seoKeywords, price, fonts: fontArray, images: imageArray, icons: iconArray, technical });
+        let newProduct = await db.product.create({ name, version, description, productType, variant, seoKeywords, price, fonts: fontArray, images: imageArray, icons: iconArray, technical:technicalArray });
 
         await newProduct.createFile({ sourceFile: sourceFiles.filename, sourceFilePassword, productId: newProduct.id });
 
         await db.templateCategory.create({ productId: newProduct.id, categoryId: category });
 
-        for (const subc of subCategory) {
-            await db.templateSubCategory.create({ productId: newProduct.id, subCategoryId: subc });
+        let subcategoryData =  subCategory.split(',');
+        for (const subc of subcategoryData) {
+            await db.templateSubCategory.create({ productId: newProduct.id, subCategoryId: parseInt(subc)  });
         }
 
         for (const soft of softwareType) {
             await db.templateSoftwareType.create({ productId: newProduct.id, softwareTypeId: soft });
         }
 
-        for (const indus of indrusty) {
+        // console.log(req.body.industry.split(',') ,'===industry');
+        let IndustryTypes = req.body.industry.split(',');
+        for (const indus of IndustryTypes) {
             await db.templateIndrusty.create({ productId: newProduct.id, industryId: indus });
         }
 
@@ -81,11 +101,7 @@ export const upload = async (req, res) => {
             await db.templateFullImages.create({ productId: newProduct.id, filename: img.filename })
         }
 
-        // var host = req.get('host');
-        // let token = jwt.sign({
-        //     link : `${sourceFile.Key}`,
-        //     password : sourceFilePassword
-        // }, process.env.JWT_PRIVATEKEY, { expiresIn: '1h' });
+        
         return res.status(200).json({ success: true, message: "Product is uploaded" });
     } catch (error) {
         console.log('upload template error',error)
@@ -268,6 +284,9 @@ export const editTemplate = async (req, res) => {
 
     try {
         
+        console.log('====================================');
+        console.log(req.body);
+        console.log('====================================');
         const directoryPath = "./uploads/";
         let { subCategory, softwareType, productType, indrusty, name, version, description, variant,
             seoKeywords, price, sourceFilePassword, fontName, fontUrl, imagesWebsiteName, imagesUrl, iconsWebsiteName,
@@ -350,18 +369,19 @@ export const editTemplate = async (req, res) => {
             await newProduct.createFile({ sourceFile: sourceFiles[0].filename, sourceFilePassword, productId: newProduct.id });
         }
 
+        await db.templateSubCategory.destroy({where :{productId : req.params.id}});
+
         for (const subc of subCategory) {
-            await db.templateSubCategory.destroy({where :{productId : req.params.id}});
             await db.templateSubCategory.create({ productId: newProduct.id, subCategoryId: subc });
         }
 
+        await db.templateSoftwareType.destroy({where :{productId : req.params.id}});
         for (const soft of softwareType) {
-            await db.templateSoftwareType.destroy({where :{productId : req.params.id}});
             await db.templateSoftwareType.create({ productId: newProduct.id, softwareTypeId: soft });
         }
 
+        await db.templateIndrusty.destroy({where :{productId : req.params.id}});
         for (const indus of indrusty) {
-            await db.templateIndrusty.destroy({where :{productId : req.params.id}});
             await db.templateIndrusty.create({ productId: newProduct.id, industryId: indus });
         }
 

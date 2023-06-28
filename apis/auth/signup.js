@@ -22,6 +22,7 @@ export const signup = async (req, res) => {
         }
         await service.sendMail(email,otp);
         let newUser = await db.user.create({name,email,password,status:'unActive'});
+        console.log(newUser,"==new user");
         await db.userMeta.create({otp,userId : newUser.id });
         return res.status(200).json({success : true,message: `Please enter Otp`,userId:newUser.id });
     } catch (error) {
