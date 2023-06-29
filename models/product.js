@@ -4,7 +4,10 @@ export default  (sequelize,DataTypes) => {
         version :  { type: DataTypes.STRING },
         description : { type: DataTypes.STRING },
         variant : { type: DataTypes.STRING },
-        price : { type: DataTypes.DOUBLE },
+        price : { 
+            type: DataTypes.DOUBLE,
+            default :null 
+        },
         seoKeywords : { type: DataTypes.STRING },
         fonts:{type : DataTypes.JSON},
         images:{type : DataTypes.JSON},

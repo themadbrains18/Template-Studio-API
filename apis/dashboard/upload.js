@@ -288,7 +288,7 @@ export const editTemplate = async (req, res) => {
         console.log(req.body);
         console.log('====================================');
         const directoryPath = "./uploads/";
-        let { subCategory, softwareType, productType, indrusty, name, version, description, variant,
+        let { subCategory, softwareType, productType, industry, name, version, description, variant,
             seoKeywords, price, sourceFilePassword, fontName, fontUrl, imagesWebsiteName, imagesUrl, iconsWebsiteName,
             iconsUrl, technical, removedSlider, removedFullPageImage } = req.body;
 
@@ -381,7 +381,7 @@ export const editTemplate = async (req, res) => {
         }
 
         await db.templateIndrusty.destroy({where :{productId : req.params.id}});
-        for (const indus of indrusty) {
+        for (const indus of industry) {
             await db.templateIndrusty.create({ productId: newProduct.id, industryId: indus });
         }
 

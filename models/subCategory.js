@@ -11,8 +11,8 @@ export default  (sequelize,DataTypes) => {
         subCategory: {
             type: DataTypes.STRING,
         },
-        image: {
-            type: DataTypes.STRING,
-        }
+        // image: {
+        //     type: DataTypes.STRING,
+        // }
     },{ timestamps: true });
 }
