@@ -51,6 +51,7 @@ router.get('/api/dashboard/all',dashboard.getAll);
 router.get('/api/admin/dashboard/all',jwtauth,dashboard.getAll);
 router.get('/api/dashboard/detail/:id',dashboard.getProductBySlug);
 router.post('/dashboard/edit/:id',jwtauth, cpUpload,dashboard.editTemplate);
+router.post('/dashboard/add/relevant/:id',jwtauth, cpUpload,dashboard.addRelevantTemplate);
 
 /**
  * Category Routes

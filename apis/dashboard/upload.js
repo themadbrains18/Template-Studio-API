@@ -206,6 +206,9 @@ export const getProductBySlug = async (req, res) => {
                     },
                 },
                 {
+                    model : db.relevantProduct,
+                },
+                {
                     model: db.templateFullImages,
                     attributes: {
                         exclude: ["createdAt", "updatedAt", "productId"]
@@ -276,7 +279,7 @@ export const getProductBySlug = async (req, res) => {
             return res.send({ status: 200, data: products })
         }
     } catch (error) {
-
+        console.log(error,'get product slug data')
     }
 }
 
@@ -396,6 +399,95 @@ export const editTemplate = async (req, res) => {
                 await db.templateFullImages.create({ productId: newProduct.id, filename: img.filename })
             }
         }
+
+        return res.status(200).json({ success: true, message: "Product is uploaded" });
+    } catch (error) {
+
+    }
+
+}
+
+export const addRelevantTemplate = async (req, res) => {
+
+    try {
+        
+        
+        const directoryPath = "./uploads/";
+        let { subCategory, softwareType, productType, industry, name, version, description, variant,
+            seoKeywords, price, sourceFilePassword, fontName, fontUrl, imagesWebsiteName, imagesUrl, iconsWebsiteName,
+            iconsUrl, technical} = req.body;
+
+        
+        let fontArray = [];
+        fontName.map((item, index) => {
+            fontArray.push({ "fontName": item, "fontUrl": fontUrl[index] });
+        })
+
+        let imageArray = [];
+        imagesWebsiteName.map((item, index) => {
+            imageArray.push({ "imageName": item, "imageUrl": imagesUrl[index] });
+        })
+
+        let iconArray = [];
+        iconsWebsiteName.map((item, index) => {
+            iconArray.push({ "iconName": item, "iconUrl": iconsUrl[index] });
+        })
+
+        // let sliderImages = req.files['sliderImages'];
+        // let fullImages = req.files['fullPageImages'];
+        // let sourceFiles = req.files['sourceFile'];
+
+        let newProduct = await db.relevantProduct.create({product_id:req.params.id, name, version, description, productType, variant, 
+            seoKeywords, price, fonts: fontArray, images: imageArray, icons: iconArray, technical });
+
+        // if (sourceFiles !== undefined && req.files['sourceFile'].length > 0) {
+            
+        //     let zip = await db.file.findOne({where :{productId : req.params.id}});
+        //     const fileName = zip.sourceFile;
+        //     fs.unlink(directoryPath + fileName, (err) => {
+        //         if (err) {
+        //             res.send({
+        //                 status: 500,
+        //                 message: "Could not delete the file. " + err,
+        //             });
+        //         }
+        //     });
+
+        //     await zip.destroy();
+        //     await newProduct.createFile({ sourceFile: sourceFiles[0].filename, sourceFilePassword, productId: newProduct.id });
+        // }
+
+        // await db.templateSubCategory.destroy({where :{productId : req.params.id}});
+
+        console.log('====================================');
+        console.log(newProduct, 'here add relevant product');
+        console.log('====================================');
+
+        for (const subc of subCategory) {
+            await db.templateSubCategory.create({ productId: req.params.id, subCategoryId: subc, relevantproductid : newProduct.id });
+        }
+
+        // await db.templateSoftwareType.destroy({where :{productId : req.params.id}});
+        for (const soft of softwareType) {
+            await db.templateSoftwareType.create({ productId: req.params.id, softwareTypeId: soft,relevantproductid : newProduct.id });
+        }
+
+        // await db.templateIndrusty.destroy({where :{productId : req.params.id}});
+        for (const indus of industry) {
+            await db.templateIndrusty.create({ productId: req.params.id, industryId: indus,relevantproductid : newProduct.id });
+        }
+
+        // if (sliderImages !== undefined && sliderImages.length > 0) {
+        //     for (const slides of sliderImages) {
+        //         await db.templateSliderImages.create({ productId: newProduct.id, filename: slides.filename })
+        //     }
+        // }
+
+        // if (fullImages !== undefined && fullImages.length > 0) {
+        //     for (const img of fullImages) {
+        //         await db.templateFullImages.create({ productId: newProduct.id, filename: img.filename })
+        //     }
+        // }
 
         return res.status(200).json({ success: true, message: "Product is uploaded" });
     } catch (error) {

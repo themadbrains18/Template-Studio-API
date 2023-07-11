@@ -7,7 +7,8 @@ export default  (sequelize,DataTypes) => {
       },
       softwareTypeId : {
          type: DataTypes.INTEGER,
-      }
+      },
+      relevantproductid :{type : DataTypes.INTEGER}
    
    },{ timestamps: true });
 }

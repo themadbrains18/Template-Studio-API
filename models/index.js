@@ -19,6 +19,7 @@ import subCategory from "./subCategory.js";
 import productType from "./productType.js";
 import newsLetter from "./newsLetter.js";
 import download from "./download.js";
+import relevantProduct from "./relevantProduct.js";
 
 import templateCategory from "./relations/templateCategory.js";
 import templateIndrusty from "./relations/templateIndustry.js";
@@ -56,7 +57,7 @@ try {
      */
     db.product = product(sequelize, DataTypes);
     db.file = file(sequelize, DataTypes);
-
+    db.relevantProduct = relevantProduct(sequelize, DataTypes);
     /**
      * Relational Table
      */
@@ -122,6 +123,17 @@ try {
     db.industry.hasMany(db.templateIndrusty);
     db.templateIndrusty.belongsTo(db.industry);
 
+    db.relevantProduct.belongsTo(db.product,{
+        foreignKey :{
+            name : 'product_id'
+        }
+    });
+    db.product.hasMany(db.relevantProduct,{
+        foreignKey :{
+            name : 'product_id'
+        }
+    });
+
     db.user.hasMany(db.download);
     db.download.belongsTo(db.user);
 
@@ -138,7 +150,7 @@ try {
     });
     // End Category to associate with subcategory list
 
-    // db.download.sync({alter:true});
+    // db.templateIndrusty.sync({alter:true});
 } catch (error) {
     console.error('Unable to connect to the database:', error);
 }

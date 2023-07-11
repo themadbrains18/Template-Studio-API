@@ -7,6 +7,7 @@ export default  (sequelize,DataTypes) => {
       },
       subCategoryId : {
          type : DataTypes.INTEGER
-      }
+      },
+      relevantproductid :{type : DataTypes.INTEGER}
    },{ timestamps: true });
 }
