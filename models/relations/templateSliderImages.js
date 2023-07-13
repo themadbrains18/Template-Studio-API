@@ -10,6 +10,9 @@ export default  (sequelize,DataTypes) => {
         },
         productId: {
             type: DataTypes.INTEGER,
-        }
+        },
+        relevantproductid: {
+            type: DataTypes.INTEGER,
+        },
     },{ timestamps: true });
 }

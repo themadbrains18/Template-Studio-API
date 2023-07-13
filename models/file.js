@@ -10,6 +10,9 @@ export default  (sequelize,DataTypes) => {
         },
         sourceFilePassword: {
             type: DataTypes.STRING,
-        }
+        },
+        relevantproductid: {
+            type: DataTypes.INTEGER,
+        },
     },{ timestamps: true });
 }
